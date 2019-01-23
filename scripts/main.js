@@ -1,10 +1,7 @@
-var APP = {};
-
-(function() {
+app = app && (function(app) {
   // Client ID and API key from the Developer Console
-  var CLIENT_ID =
-    '18128763918-hqqggo942mbjuljfe5l7ou6o9eg7kdgp.apps.googleusercontent.com';
-  var API_KEY = 'AIzaSyC6thBBiZ7W4ITXPPbJSsLIP5XvuJ4bL5Q';
+  var CLIENT_ID = app.CLIENT_ID;
+  var API_KEY = app.API_KEY;
 
   // Array of API discovery doc URLs for APIs used by the quickstart
   var DISCOVERY_DOCS = [
@@ -21,15 +18,15 @@ var APP = {};
   /**
    *  On load, called to load the auth2 library and API client library.
    */
-  APP.handleClientLoad = function() {
-    gapi.load('client:auth2', APP.initClient);
-  }
+  app.handleClientLoad = function() {
+    gapi.load('client:auth2', app.initClient);
+  };
 
   /**
    *  Initializes the API client library and sets up sign-in state
    *  listeners.
    */
-  APP.initClient = function() {
+  app.initClient = function() {
     gapi.client
       .init({
         apiKey: API_KEY,
@@ -40,81 +37,85 @@ var APP = {};
       .then(
         function() {
           // Listen for sign-in state changes.
-          gapi.auth2.getAuthInstance().isSignedIn.listen(APP.updateSigninStatus);
+          gapi.auth2
+            .getAuthInstance()
+            .isSignedIn.listen(app.updateSigninStatus);
 
           // Handle the initial sign-in state.
-          APP.updateSigninStatus(gapi.auth2.getAuthInstance().isSignedIn.get());
-          authorizeButton.onclick = APP.handleAuthClick;
-          signoutButton.onclick = APP.handleSignoutClick;
+          app.updateSigninStatus(gapi.auth2.getAuthInstance().isSignedIn.get());
+          authorizeButton.onclick = app.handleAuthClick;
+          signoutButton.onclick = app.handleSignoutClick;
         },
         function(error) {
-          APP.appendPre(JSON.stringify(error, null, 2));
+          app.appendPre(JSON.stringify(error, null, 2));
         }
       );
-  }
+  };
 
   /**
    *  Called when the signed in status changes, to update the UI
    *  appropriately. After a sign-in, the API is called.
    */
-  APP.updateSigninStatus = function(isSignedIn) {
+  app.updateSigninStatus = function(isSignedIn) {
     if (isSignedIn) {
       authorizeButton.style.display = 'none';
       signoutButton.style.display = 'block';
-      APP.listLabels();
+      app.listLabels();
     } else {
       authorizeButton.style.display = 'block';
       signoutButton.style.display = 'none';
     }
-  }
+  };
 
   /**
    *  Sign in the user upon button click.
    */
-  APP.handleAuthClick = function(event) {
+  app.handleAuthClick = function(event) {
     gapi.auth2.getAuthInstance().signIn();
-  }
+  };
 
   /**
    *  Sign out the user upon button click.
    */
-  APP.handleSignoutClick = function(event) {
+  app.handleSignoutClick = function(event) {
     gapi.auth2.getAuthInstance().signOut();
-  }
+  };
 
   /**
-   * Append a pre element to the body containing the given message
+   * append a pre element to the body containing the given message
    * as its text node. Used to display the results of the API call.
    *
    * @param {string} message Text to be placed in pre element.
    */
-  APP.appendPre = function(message) {
+  app.appendPre = function(message) {
     var pre = document.getElementById('content');
     var textContent = document.createTextNode(message + '\n');
     pre.appendChild(textContent);
-  }
+  };
 
   /**
    * Print all Labels in the authorized user's inbox. If no labels
    * are found an appropriate message is printed.
    */
-  APP.listLabels = function() {
+  app.listLabels = function() {
     gapi.client.gmail.users.labels
       .list({
         userId: 'me',
       })
       .then(function(response) {
         var labels = response.result.labels;
-        APP.appendPre('Labels:');
+        app.appendPre('Labels:');
 
         if (labels && labels.length > 0) {
           for (i = 0; i < labels.length; i++) {
             var label = labels[i];
-            APP.appendPre(label.name);
+            app.appendPre(label.name);
           }
         } else {
-          APP.appendPre('No Labels found.');
+          app.appendPre('No Labels found.');
         }
       });
-  }
-})();
+  };
+
+  return app;
+})(app);

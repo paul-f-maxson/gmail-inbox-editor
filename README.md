@@ -1,0 +1,1 @@
+`python -m SimpleHTTPServer 8000` will work to serve this app.
